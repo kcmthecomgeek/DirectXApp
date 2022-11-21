@@ -5,6 +5,9 @@ GraphicsEngine::GraphicsEngine()
 	m_d3d_device = nullptr;
 	m_feature_level = D3D_FEATURE_LEVEL_11_0;
 	m_imm_context = nullptr;
+	m_dxgi_device = nullptr;
+	m_dxgi_adapter = nullptr;
+	m_dxgi_factory = nullptr;
 }
 
 GraphicsEngine::~GraphicsEngine()
@@ -56,6 +59,11 @@ bool GraphicsEngine::init()
 	// App isn't compatible. Return failure...
 	if (FAILED(result))
 		return false;
+
+	m_d3d_device->QueryInterface(__uuidof(IDXGIDevice), (void**)&m_dxgi_device);
+	m_dxgi_device->GetParent(__uuidof(IDXGIAdapter), (void**)&m_dxgi_adapter);
+	m_dxgi_adapter->GetParent(__uuidof(IDXGIFactory), (void**)&m_dxgi_factory);
+	m_dxgi_factory->CreateSwapChain()
 
 	return true;
 }
