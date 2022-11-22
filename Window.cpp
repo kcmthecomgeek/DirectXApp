@@ -44,7 +44,7 @@ bool Window::init()
 		NULL, // Parent window.
 		NULL, // Menu object.
 		NULL, // HINSTANCE
-		this); // Create paramters. Adding "this" will allow the pointer to this object to be accessed in WM_CREATE.
+		this); // Create paramters. Adding "this" will pass a point to this object for use in WM_CREATE.
 
 	// Return false if window couldn't be created.
 	if (!m_hwnd)
@@ -61,14 +61,14 @@ bool Window::init()
 
 bool Window::broadcast()
 {
+	this->onUpdate();
+
 	MSG msg;
 	while (::PeekMessage(&msg, NULL, 0, 0, PM_REMOVE) > 0)
 	{
 		::TranslateMessage(&msg);
 		::DispatchMessage(&msg);
 	}
-
-	this->onUpdate();
 
 	Sleep(1);
 
