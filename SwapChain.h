@@ -7,12 +7,12 @@ public:
 	SwapChain();
 	~SwapChain();
 
-	bool init();
+	bool init(HWND hwnd, UINT width, UINT height);
 	bool release();
 	
 	void present();
 
 private:
-
+	IDXGISwapChain* m_swap_chain;
 };
 

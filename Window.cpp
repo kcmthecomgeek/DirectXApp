@@ -1,6 +1,5 @@
 #include "Window.h"
 
-Window* window = nullptr;
 
 Window::Window()
 {
@@ -34,9 +33,6 @@ bool Window::init()
 	if (!::RegisterClassEx(&wc))
 		return false;
 
-	if (!window)
-		window = this;
-
 	// Create and store Window object.
 	m_hwnd = ::CreateWindowEx(
 		WS_EX_OVERLAPPEDWINDOW, // Extended style flags.
@@ -48,7 +44,7 @@ bool Window::init()
 		NULL, // Parent window.
 		NULL, // Menu object.
 		NULL, // HINSTANCE
-		NULL); // Always NULL.
+		this); // Create paramters. Adding "this" will allow the pointer to this object to be accessed in WM_CREATE.
 
 	// Return false if window couldn't be created.
 	if (!m_hwnd)
@@ -72,7 +68,7 @@ bool Window::broadcast()
 		::DispatchMessage(&msg);
 	}
 
-	window->onUpdate();
+	this->onUpdate();
 
 	Sleep(1);
 
@@ -86,6 +82,13 @@ bool Window::release()
 		return false;
 
 	return true;
+}
+
+RECT Window::getClientWindowRect()
+{
+	RECT rc = {};
+	::GetClientRect(this->m_hwnd, &rc);
+	return rc;
 }
 
 void Window::onCreate()
@@ -109,11 +112,19 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	{
 	case WM_CREATE:
 	{
+		// Copy the pointer passed in last parameter in "CreateWindowEx".
+		Window* window = (Window*)((LPCREATESTRUCT)lParam)->lpCreateParams;
+		// Store the pointer in custom user data for the window.
+		SetWindowLongPtr(hWnd, GWLP_USERDATA, (LONG_PTR)window);
+		// Store the HWND object in the "Window" pointer.
+		window->setHWND(hWnd);
 		window->onCreate();
 		break;
 	}
 	case WM_DESTROY:
 	{
+		// Get the pointer to the "Window" object that generated this window.
+		Window* window = (Window*)GetWindowLongPtr(hWnd, GWLP_USERDATA);
 		window->onDestroy();
 		::PostQuitMessage(0);
 		break;

@@ -11,6 +11,9 @@ public:
 	bool broadcast();
 	bool release();
 
+	RECT getClientWindowRect();
+	void setHWND(HWND hwnd) { this->m_hwnd = hwnd; };
+
 	virtual void onCreate();
 	virtual void onUpdate();
 	virtual void onDestroy();

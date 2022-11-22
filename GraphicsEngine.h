@@ -14,6 +14,8 @@ public:
 
 	static GraphicsEngine* get();
 
+	SwapChain* createSwapChain();
+
 private:
 	// D3D Base Init
 	ID3D11Device* m_d3d_device;
