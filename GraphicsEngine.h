@@ -4,21 +4,32 @@
 class SwapChain;
 class DeviceContext;
 class VertexBuffer;
+class VertexShader;
 
 class GraphicsEngine
 {
 public:
 	GraphicsEngine();
 	~GraphicsEngine();
-
 	bool init();
 	bool release();
+
+public:
 	SwapChain* createSwapChain(); // Create the swap chain (back buffer).
 	DeviceContext* getImmediateDeviceContext() { return this->m_imm_device_context; }; // Get immediate context.
 	VertexBuffer* createVertexBuffer(); // Create a new vertex buffer.
+	VertexShader* createVertexShader(const void* shader_byte_code, size_t byte_code_size);
+
+public:
+	bool compileVertexShader(const wchar_t* file_name, const char* entry_point_name,
+		void** shader_byte_code, size_t* byte_code_size);
+	void releaseCompiledShader();
+	// Default simple shaders.
 	bool createShaders(); // Create shaders and compile.
 	bool setShaders(); // Get shadeers.
-	void getShaderBufferAndSize(void** bytecode, UINT* size); // Get shader buffer and size.
+	// void getShaderBufferAndSize(void** bytecode, UINT* size); // Get shader buffer and size.
+
+public:
 	// Singleton.
 	static GraphicsEngine* get();
 
@@ -33,6 +44,8 @@ private:
 	IDXGIFactory* m_dxgi_factory;
 	ID3D11DeviceContext* m_imm_context;
 	// Shaders
+	ID3DBlob* m_blob;
+
 	ID3DBlob* m_vsblob;
 	ID3DBlob* m_psblob;
 	ID3D11VertexShader* m_vs;
@@ -40,5 +53,6 @@ private:
 	// Friend classes
 	friend class SwapChain;
 	friend class VertexBuffer;
+	friend class VertexShader;
 };
 

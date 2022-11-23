@@ -17,6 +17,7 @@ AppWindow::AppWindow()
 {
 	m_swap_chain = nullptr;
 	m_vb = nullptr;
+	m_vs = nullptr;
 }
 
 AppWindow::~AppWindow()
@@ -64,12 +65,17 @@ void AppWindow::onCreate()
 	UINT size_list = ARRAYSIZE(list);
 	GraphicsEngine::get()->createShaders();
 
-	// Compile the shader and load it.
 	void* shader_byte_code = nullptr;
-	UINT size_shader = 0;
-	GraphicsEngine::get()->getShaderBufferAndSize(&shader_byte_code, &size_shader);
+	size_t size_shader = 0;
+	GraphicsEngine::get()->compileVertexShader(L"VertexShader.hlsl", "vsmain", &shader_byte_code, &size_shader);
+
+	// Compile the shader and load it.
+	//GraphicsEngine::get()->getShaderBufferAndSize(&shader_byte_code, &size_shader);
+	m_vs = GraphicsEngine::get()->createVertexShader(shader_byte_code, size_shader);
 	m_vb->load(list, sizeof(vertex), size_list, shader_byte_code, size_shader);
 
+	// Release compiled shader.
+	GraphicsEngine::get()->releaseCompiledShader();
 }
 
 void AppWindow::onUpdate()
@@ -77,12 +83,14 @@ void AppWindow::onUpdate()
 	Window::onUpdate();
 	// Spit out color on the screen :)
 	GraphicsEngine::get()->getImmediateDeviceContext()->clearRenderTargetColor(this->m_swap_chain,
-		1, 0, 1, 1);
+		0, 0.5f, 0.5f, 1);
 
 	// Set view port and vertex buffer.
 	RECT rc = this->getClientWindowRect();
 	GraphicsEngine::get()->getImmediateDeviceContext()->setViewportSize(rc.right - rc.left, rc.bottom - rc.top);
 	GraphicsEngine::get()->setShaders();
+	// Set vertex shader.
+	GraphicsEngine::get()->getImmediateDeviceContext()->setVertexShader(m_vs);
 	GraphicsEngine::get()->getImmediateDeviceContext()->setVertexBuffer(m_vb);
 	// Draw the triangle using the vertices pushed to the context.
 	GraphicsEngine::get()->getImmediateDeviceContext()->drawTriangleStrip(m_vb->getSizeVertexList(), 0);
