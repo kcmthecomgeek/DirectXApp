@@ -13,6 +13,7 @@ public:
 	void clearRenderTargetColor(SwapChain* swap_chain, float r, float g, float b, float a); // Clear window with color.
 	void setVertexBuffer(VertexBuffer* vertex_buffer);
 	void drawTriangleList(UINT vertex_count, UINT start_vertex_index);
+	void drawTriangleStrip(UINT vertext_count, UINT start_vertex_index);
 	void setViewportSize(UINT width, UINT height);
 	bool release();
 

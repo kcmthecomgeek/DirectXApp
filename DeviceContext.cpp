@@ -24,21 +24,30 @@ void DeviceContext::clearRenderTargetColor(SwapChain* swap_chain, float r, float
 
 void DeviceContext::setVertexBuffer(VertexBuffer* vertex_buffer)
 {
+	// Send the supplied vertex buffer object over to the device context for use.
 	UINT stride = vertex_buffer->m_size_vertex;
 	UINT offset = 0;
-	m_device_context->IASetVertexBuffers(0, 1, &vertex_buffer->m_buffer, &stride, &offset);
-	m_device_context->IASetInputLayout(vertex_buffer->m_layout);
+	m_device_context->IASetVertexBuffers(0, 1, &vertex_buffer->m_buffer, &stride, &offset); // Set buffers.
+	m_device_context->IASetInputLayout(vertex_buffer->m_layout); // Set layout.
 }
 
 void DeviceContext::drawTriangleList(UINT vertex_count, UINT start_vertex_index)
 {
+	// Draw the vertices using a primitive trianglelist.
 	m_device_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	m_device_context->Draw(vertex_count, start_vertex_index); // Draw the vertices.
+}
 
-	m_device_context->Draw(vertex_count, start_vertex_index);
+void DeviceContext::drawTriangleStrip(UINT vertex_count, UINT start_vertex_index)
+{
+	// Draw the vertices using a primitive trianglestrip.
+	m_device_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+	m_device_context->Draw(vertex_count, start_vertex_index); // Draw the vertices.
 }
 
 void DeviceContext::setViewportSize(UINT width, UINT height)
 {
+	// Set the view port (what the user sees?). The displayed screen space.
 	D3D11_VIEWPORT vp = {};
 	vp.Width = width;
 	vp.Height = height;

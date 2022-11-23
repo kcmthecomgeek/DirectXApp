@@ -54,6 +54,7 @@ bool Window::init()
 	::ShowWindow(m_hwnd, SW_SHOW);
 	::UpdateWindow(m_hwnd);
 
+	// "Start" the game.
 	m_isRunning = true;
 
 	return true;
@@ -61,8 +62,10 @@ bool Window::init()
 
 bool Window::broadcast()
 {
+	// Call the exposed update function.
 	this->onUpdate();
 
+	// Peek and redirect messages in the queue.
 	MSG msg;
 	while (::PeekMessage(&msg, NULL, 0, 0, PM_REMOVE) > 0)
 	{
@@ -70,6 +73,7 @@ bool Window::broadcast()
 		::DispatchMessage(&msg);
 	}
 
+	// Prevent 99% CPU.
 	Sleep(1);
 
 	return true;
@@ -86,6 +90,7 @@ bool Window::release()
 
 RECT Window::getClientWindowRect()
 {
+	// Get client rect of this window using WinAPI.
 	RECT rc = {};
 	::GetClientRect(this->m_hwnd, &rc);
 	return rc;

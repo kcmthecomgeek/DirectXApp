@@ -13,13 +13,13 @@ public:
 
 	bool init();
 	bool release();
-	SwapChain* createSwapChain();
+	SwapChain* createSwapChain(); // Create the swap chain (back buffer).
 	DeviceContext* getImmediateDeviceContext() { return this->m_imm_device_context; }; // Get immediate context.
-	VertexBuffer* createVertexBuffer();
-	bool createShaders();
-	bool setShaders();
-	void getShaderBufferAndSize(void** bytecode, UINT* size);
-
+	VertexBuffer* createVertexBuffer(); // Create a new vertex buffer.
+	bool createShaders(); // Create shaders and compile.
+	bool setShaders(); // Get shadeers.
+	void getShaderBufferAndSize(void** bytecode, UINT* size); // Get shader buffer and size.
+	// Singleton.
 	static GraphicsEngine* get();
 
 private:
