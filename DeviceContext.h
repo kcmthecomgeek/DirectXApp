@@ -3,7 +3,9 @@
 
 class SwapChain;
 class VertexBuffer;
+class ConstantBuffer;
 class VertexShader;
+class PixelShader;
 
 class DeviceContext
 {
@@ -17,9 +19,12 @@ public:
 	void drawTriangleStrip(UINT vertext_count, UINT start_vertex_index);
 	void setViewportSize(UINT width, UINT height);
 	void setVertexShader(VertexShader* vertex_shader);
+	void setPixelShader(PixelShader* pixel_shader);
 	bool release();
 
 private:
 	ID3D11DeviceContext* m_device_context;
+
+	friend class ConstantBuffer;
 };
 

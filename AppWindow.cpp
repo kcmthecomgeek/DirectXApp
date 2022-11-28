@@ -18,6 +18,8 @@ AppWindow::AppWindow()
 	m_swap_chain = nullptr;
 	m_vb = nullptr;
 	m_vs = nullptr;
+	m_ps = nullptr;
+	m_cb = nullptr;
 }
 
 AppWindow::~AppWindow()
@@ -63,7 +65,7 @@ void AppWindow::onCreate()
 	// Create the vertext buffer and shader.
 	m_vb = GraphicsEngine::get()->createVertexBuffer();
 	UINT size_list = ARRAYSIZE(list);
-	GraphicsEngine::get()->createShaders();
+	//GraphicsEngine::get()->createShaders();
 
 	void* shader_byte_code = nullptr;
 	size_t size_shader = 0;
@@ -75,6 +77,10 @@ void AppWindow::onCreate()
 	m_vb->load(list, sizeof(vertex), size_list, shader_byte_code, size_shader);
 
 	// Release compiled shader.
+	GraphicsEngine::get()->releaseCompiledShader();
+
+	GraphicsEngine::get()->compilePixelShader(L"PixelShader.hlsl", "psmain", &shader_byte_code, &size_shader);
+	m_ps = GraphicsEngine::get()->createPixelShader(shader_byte_code, size_shader);
 	GraphicsEngine::get()->releaseCompiledShader();
 }
 
@@ -88,20 +94,24 @@ void AppWindow::onUpdate()
 	// Set view port and vertex buffer.
 	RECT rc = this->getClientWindowRect();
 	GraphicsEngine::get()->getImmediateDeviceContext()->setViewportSize(rc.right - rc.left, rc.bottom - rc.top);
-	GraphicsEngine::get()->setShaders();
-	// Set vertex shader.
+	//GraphicsEngine::get()->setShaders();
+	// Set vertex and pixel shader.
 	GraphicsEngine::get()->getImmediateDeviceContext()->setVertexShader(m_vs);
+	GraphicsEngine::get()->getImmediateDeviceContext()->setPixelShader(m_ps);
+
 	GraphicsEngine::get()->getImmediateDeviceContext()->setVertexBuffer(m_vb);
 	// Draw the triangle using the vertices pushed to the context.
 	GraphicsEngine::get()->getImmediateDeviceContext()->drawTriangleStrip(m_vb->getSizeVertexList(), 0);
 	// Present back buffer.
-	m_swap_chain->present(false);
+	m_swap_chain->present(true);
 }
 
 void AppWindow::onDestroy()
 {
 	Window::onDestroy();
-	m_vb->release();
+	if (m_vb) m_vb->release();
 	m_swap_chain->release();
+	if (m_vs) m_vs->release();
+	if (m_ps) m_ps->release();
 	GraphicsEngine::get()->release();
 }
