@@ -1,5 +1,4 @@
 #include "AppWindow.h"
-#include <Windows.h>
 
 // 3 point vector.
 struct vec3
@@ -11,17 +10,6 @@ struct vec3
 struct vertex
 {
 	vec3 position;
-	vec3 position1;
-	vec3 color;
-	vec3 color1;
-	float txSpeed;
-	float clrSpeed;
-};
-
-__declspec(align(16))
-struct constant
-{
-	unsigned int m_time;
 };
 
 AppWindow::AppWindow()
@@ -29,9 +17,7 @@ AppWindow::AppWindow()
 {
 	m_swap_chain = nullptr;
 	m_vb = nullptr;
-	m_cb = nullptr;
 	m_vs = nullptr;
-	m_ps = nullptr;
 }
 
 AppWindow::~AppWindow()
@@ -66,55 +52,30 @@ void AppWindow::onCreate()
 	};**/
 
 	// List od points for the quad, first three are initial triangle, last one is the remaining.
-	/*vertex list[] =
-	{
-		{ -0.5f, -0.5f, 0.0f,	0.0f, 0.0f, 0.0f }, // Bottom left,
-		{ -0.5f, 0.5f, 0.0f,	1.0f, 1.0f, 0.0f }, // Top left,
-		{ 0.5f, -0.5f, 0.0f,	0.0f, 0.0f, 1.0f }, // Bottom right,
-		{ 0.5f, 0.5f, 0.0f,		1.0f, 1.0f, 1.0f } // Top right.
-	};*/
-
-	// sx, sy, sz				ex, ey, ez				scr, scg, scb		ecr, ecg, ecb		txSpeed, clrSpeed
 	vertex list[] =
 	{
-		{ -0.5f, -0.5f, 0.0f,	-0.32f, -0.11f, 0.0f,	0.0f, 0.0f, 0.0f,	0.0f, 1.0f, 0.0f,	500.0f, 100.0f }, // Bottom left,
-		{ -0.5f, 0.5f, 0.0f,	-0.11f, 0.78f, 0.0f,	1.0f, 1.0f, 0.0f,	0.0f, 1.0f, 1.0f,	500.0f, 100.0f }, // Top left,
-		{ 0.5f, -0.5f, 0.0f,	0.75f, -0.73f, 0.0f,	0.0f, 0.0f, 1.0f,	1.0f, 0.0f, 0.0f,	500.0f, 100.0f }, // Bottom right,
-		{ 0.5f, 0.5f, 0.0f,		0.88f, 0.77f, 0.0f,		1.0f, 1.0f, 1.0f,	0.0f, 0.0f, 1.0f,	500.0f, 100.0f } // Top right.
+		{ -0.5f, -0.5f, 0.0f }, // Bottom left,
+		{ -0.5f, 0.5f, 0.0f }, // Top left,
+		{ 0.5f, -0.5f, 0.0f }, // Bottom right,
+		{ 0.5f, 0.5f, 0.0f } // Top right.
 	};
 
 	// Create the vertext buffer and shader.
 	m_vb = GraphicsEngine::get()->createVertexBuffer();
 	UINT size_list = ARRAYSIZE(list);
-	//GraphicsEngine::get()->createShaders();
+	GraphicsEngine::get()->createShaders();
 
 	void* shader_byte_code = nullptr;
 	size_t size_shader = 0;
-	// Compile the shader and load it.
 	GraphicsEngine::get()->compileVertexShader(L"VertexShader.hlsl", "vsmain", &shader_byte_code, &size_shader);
+
+	// Compile the shader and load it.
 	//GraphicsEngine::get()->getShaderBufferAndSize(&shader_byte_code, &size_shader);
 	m_vs = GraphicsEngine::get()->createVertexShader(shader_byte_code, size_shader);
 	m_vb->load(list, sizeof(vertex), size_list, shader_byte_code, size_shader);
 
 	// Release compiled shader.
 	GraphicsEngine::get()->releaseCompiledShader();
-
-	// Pixel shader...
-	GraphicsEngine::get()->compilePixelShader(L"PixelShader.hlsl", "psmain", &shader_byte_code, &size_shader);
-
-	// Compile the shader and load it.
-	//GraphicsEngine::get()->getShaderBufferAndSize(&shader_byte_code, &size_shader);
-	m_ps = GraphicsEngine::get()->createPixelShader(shader_byte_code, size_shader);
-	//m_vb->load(list, sizeof(vertex), size_list, shader_byte_code, size_shader);
-
-	// Release compiled shader.
-	GraphicsEngine::get()->releaseCompiledShader();
-
-	// Constant Buffer
-	constant cc = {};
-	cc.m_time = 0;
-	m_cb = GraphicsEngine::get()->createConstantBuffer();
-	m_cb->load(&cc, sizeof(constant));
 }
 
 void AppWindow::onUpdate()
@@ -122,23 +83,14 @@ void AppWindow::onUpdate()
 	Window::onUpdate();
 	// Spit out color on the screen :)
 	GraphicsEngine::get()->getImmediateDeviceContext()->clearRenderTargetColor(this->m_swap_chain,
-		0, 0.35f, 0.5f, 1);
+		0, 0.5f, 0.5f, 1);
 
 	// Set view port and vertex buffer.
 	RECT rc = this->getClientWindowRect();
 	GraphicsEngine::get()->getImmediateDeviceContext()->setViewportSize(rc.right - rc.left, rc.bottom - rc.top);
-	//GraphicsEngine::get()->setShaders();
-	
-	constant cc = {};
-	cc.m_time = ::GetTickCount();
-	m_cb->update(GraphicsEngine::get()->getImmediateDeviceContext(), &cc);
-	GraphicsEngine::get()->getImmediateDeviceContext()->setConstantBuffer(m_vs, m_cb);
-	GraphicsEngine::get()->getImmediateDeviceContext()->setConstantBuffer(m_ps, m_cb);
-
+	GraphicsEngine::get()->setShaders();
 	// Set vertex shader.
 	GraphicsEngine::get()->getImmediateDeviceContext()->setVertexShader(m_vs);
-	GraphicsEngine::get()->getImmediateDeviceContext()->setPixelShader(m_ps);
-
 	GraphicsEngine::get()->getImmediateDeviceContext()->setVertexBuffer(m_vb);
 	// Draw the triangle using the vertices pushed to the context.
 	GraphicsEngine::get()->getImmediateDeviceContext()->drawTriangleStrip(m_vb->getSizeVertexList(), 0);
@@ -149,10 +101,7 @@ void AppWindow::onUpdate()
 void AppWindow::onDestroy()
 {
 	Window::onDestroy();
-	if (m_vb) m_vb->release();
-	if (m_cb) m_cb->release();
+	m_vb->release();
 	m_swap_chain->release();
-	if (m_vs) m_vs->release();
-	if (m_ps) m_ps->release();
 	GraphicsEngine::get()->release();
 }

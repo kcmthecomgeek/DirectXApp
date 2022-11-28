@@ -6,7 +6,6 @@ class DeviceContext;
 class VertexBuffer;
 class ConstantBuffer;
 class VertexShader;
-class PixelShader;
 
 class GraphicsEngine
 {
@@ -22,16 +21,14 @@ public:
 	VertexBuffer* createVertexBuffer(); // Create a new vertex buffer.
 	ConstantBuffer* createConstantBuffer();
 	VertexShader* createVertexShader(const void* shader_byte_code, size_t byte_code_size);
-	PixelShader* createPixelShader(const void* shader_byte_code, size_t byte_code_size);
+
 public:
 	bool compileVertexShader(const wchar_t* file_name, const char* entry_point_name,
 		void** shader_byte_code, size_t* byte_code_size);
-	bool compilePixelShader(const wchar_t* file_name, const char* entry_point_name,
-		void** shader_byte_code, size_t* byte_code_size);
 	void releaseCompiledShader();
 	// Default simple shaders.
-	// bool createShaders(); // Create shaders and compile.
-	// bool setShaders(); // Get shadeers.
+	bool createShaders(); // Create shaders and compile.
+	bool setShaders(); // Get shadeers.
 	// void getShaderBufferAndSize(void** bytecode, UINT* size); // Get shader buffer and size.
 
 public:
@@ -60,6 +57,5 @@ private:
 	friend class VertexBuffer;
 	friend class ConstantBuffer;
 	friend class VertexShader;
-	friend class PixelShader;
 };
 
