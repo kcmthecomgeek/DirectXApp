@@ -19,7 +19,7 @@ struct vertex
 __declspec(align(16))
 struct constant
 {
-	unsigned int m_time;
+	float m_angle;
 };
 
 AppWindow::AppWindow()
@@ -94,7 +94,7 @@ void AppWindow::onCreate()
 	GraphicsEngine::get()->releaseCompiledShader();
 
 	constant cc = {};
-	cc.m_time = 0;
+	cc.m_angle = 0;
 
 	m_cb = GraphicsEngine::get()->createConstantBuffer();
 	m_cb->load(&cc, sizeof(constant));
@@ -111,8 +111,15 @@ void AppWindow::onUpdate()
 	RECT rc = this->getClientWindowRect();
 	GraphicsEngine::get()->getImmediateDeviceContext()->setViewportSize(rc.right - rc.left, rc.bottom - rc.top);
 
+
+	unsigned long new_time = 0;
+	if (m_old_time)
+		new_time = ::GetTickCount() - m_old_time;
+	m_delta_time = new_time / 1000.0f;
+	m_old_time = ::GetTickCount();
+	m_angle += 1.57f * m_delta_time;
 	constant cc = {};
-	cc.m_time = ::GetTickCount();
+	cc.m_angle = m_angle;
 	m_cb->update(GraphicsEngine::get()->getImmediateDeviceContext(), &cc);
 
 	GraphicsEngine::get()->getImmediateDeviceContext()->setConstantBuffer(m_vs, m_cb);
@@ -127,7 +134,7 @@ void AppWindow::onUpdate()
 	// Draw the triangle using the vertices pushed to the context.
 	GraphicsEngine::get()->getImmediateDeviceContext()->drawTriangleStrip(m_vb->getSizeVertexList(), 0);
 	// Present back buffer.
-	m_swap_chain->present(false);
+	m_swap_chain->present(true);
 }
 
 void AppWindow::onDestroy()

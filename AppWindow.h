@@ -26,5 +26,9 @@ private:
     ConstantBuffer* m_cb;
     VertexShader* m_vs;
     PixelShader* m_ps;
+
+    unsigned long m_old_time = 0;
+    float m_delta_time = 0;
+    float m_angle = 0;
 };
 
