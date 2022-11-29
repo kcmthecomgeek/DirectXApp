@@ -10,6 +10,7 @@ struct vec3
 struct vertex
 {
 	vec3 position;
+	vec3 color;
 };
 
 AppWindow::AppWindow()
@@ -56,10 +57,10 @@ void AppWindow::onCreate()
 	// List od points for the quad, first three are initial triangle, last one is the remaining.
 	vertex list[] =
 	{
-		{ -0.5f, -0.5f, 0.0f }, // Bottom left,
-		{ -0.5f, 0.5f, 0.0f }, // Top left,
-		{ 0.5f, -0.5f, 0.0f }, // Bottom right,
-		{ 0.5f, 0.5f, 0.0f } // Top right.
+		{ -0.5f, -0.5f, 0.0f,	0, 0, 0 }, // Bottom left,
+		{ -0.5f, 0.5f, 0.0f,	1, 1, 0 }, // Top left,
+		{ 0.5f, -0.5f, 0.0f,	0, 0, 1 }, // Bottom right,
+		{ 0.5f, 0.5f, 0.0f,		1, 1, 1 } // Top right.
 	};
 
 	// Create the vertext buffer and shader.
@@ -89,7 +90,7 @@ void AppWindow::onUpdate()
 	Window::onUpdate();
 	// Spit out color on the screen :)
 	GraphicsEngine::get()->getImmediateDeviceContext()->clearRenderTargetColor(this->m_swap_chain,
-		0, 0.5f, 0.5f, 1);
+		0, 0.37f, 0.5f, 1);
 
 	// Set view port and vertex buffer.
 	RECT rc = this->getClientWindowRect();
