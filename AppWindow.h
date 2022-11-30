@@ -15,6 +15,8 @@ public:
     AppWindow();
     ~AppWindow();
 
+    void updateQuadPosition();
+
     // Inherited
     virtual void onCreate() override;
     virtual void onUpdate() override;
@@ -30,5 +32,9 @@ private:
     unsigned long m_old_time = 0;
     float m_delta_time = 0;
     float m_angle = 0;
+    float m_delta_pos = 0;
+    float m_delta_scale = 0;
+    //float m_old_delta = 0;
+    //float m_new_delta = 0;
 };
 
