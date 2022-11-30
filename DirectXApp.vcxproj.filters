@@ -34,6 +34,9 @@
     <Filter Include="GameEngine\Math">
       <UniqueIdentifier>{03477e4d-00a6-43ad-bee0-b1305cefe235}</UniqueIdentifier>
     </Filter>
+    <Filter Include="GameEngine\GraphicsEngine\IndexBuffer">
+      <UniqueIdentifier>{2bc50abc-5331-4e6d-98fd-312ceb9a49bf}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AppWindow.cpp">
@@ -65,6 +68,9 @@
     </ClCompile>
     <ClCompile Include="PixelShader.cpp">
       <Filter>GameEngine\GraphicsEngine\PixelShader</Filter>
+    </ClCompile>
+    <ClCompile Include="IndexBuffer.cpp">
+      <Filter>GameEngine\GraphicsEngine\IndexBuffer</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -100,6 +106,9 @@
     </ClInclude>
     <ClInclude Include="Matrix4x4.h">
       <Filter>GameEngine\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="IndexBuffer.h">
+      <Filter>GameEngine\GraphicsEngine\IndexBuffer</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
