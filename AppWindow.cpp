@@ -5,6 +5,7 @@
 #include <Windows.h>
 #include "Vector3D.h"
 #include "Matrix4x4.h"
+#include "InputSystem.h"
 
 // 3 point vector.
 struct vec3
@@ -73,15 +74,15 @@ void AppWindow::updateQuadPosition()
 	cc.m_world.setScale(Vector3D(1.0f, 1.0f, 1.0f));
 
 	temp.setIdentity();
-	temp.setRotationZ(m_delta_scale);
+	temp.setRotationZ(0.0f);
 	cc.m_world *= temp;
 
 	temp.setIdentity();
-	temp.setRotationY(m_delta_scale);
+	temp.setRotationY(m_rot_y);
 	cc.m_world *= temp;
 
 	temp.setIdentity();
-	temp.setRotationX(m_delta_scale);
+	temp.setRotationX(m_rot_x);
 	cc.m_world *= temp;
 
 	cc.m_view.setIdentity();
@@ -101,6 +102,10 @@ void AppWindow::onCreate()
 {
 	// Base call.
 	Window::onCreate();
+
+	// Add InputListener for Keyboard.
+	InputSystem::get()->addListener(this);
+
 	// Init graphics engine.
 	GraphicsEngine::get()->init();
 	// Create swap chain.
@@ -195,6 +200,10 @@ void AppWindow::onCreate()
 void AppWindow::onUpdate()
 {
 	Window::onUpdate();
+
+	// Update key values.
+	InputSystem::get()->update();
+
 	// Spit out color on the screen :)
 	GraphicsEngine::get()->getImmediateDeviceContext()->clearRenderTargetColor(this->m_swap_chain,
 		0, 0.37f, 0.5f, 1);
@@ -231,6 +240,10 @@ void AppWindow::onUpdate()
 void AppWindow::onDestroy()
 {
 	Window::onDestroy();
+
+	// Remove InputSystem listener.
+	InputSystem::get()->removeListener(this);
+
 	if (m_vb) m_vb->release();
 	if (m_cb) m_cb->release();
 	if (m_ib) m_ib->release();
@@ -238,4 +251,29 @@ void AppWindow::onDestroy()
 	if (m_vs) m_vs->release();
 	if (m_ps) m_ps->release();
 	GraphicsEngine::get()->release();
+}
+
+void AppWindow::onKeyDown(int key)
+{
+	if (key == 'W')
+	{
+		m_rot_x += 3.14f * m_delta_time;
+	}
+	else if (key == 'S')
+	{
+		m_rot_x -= 3.14f * m_delta_time;
+	}
+	else if (key == 'A')
+	{
+		m_rot_y += 3.14f * m_delta_time;
+	}
+	else if (key == 'D')
+	{
+		m_rot_y -= 3.14f * m_delta_time;
+	}
+}
+
+void AppWindow::onKeyUp(int key)
+{
+
 }
