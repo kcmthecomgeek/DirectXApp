@@ -16,7 +16,6 @@ struct vec3
 struct vertex
 {
 	Vector3D position;
-	Vector3D position1;
 	Vector3D color;
 	Vector3D color1;
 };
@@ -38,6 +37,7 @@ AppWindow::AppWindow()
 	m_vs = nullptr;
 	m_ps = nullptr;
 	m_cb = nullptr;
+	m_ib = nullptr;
 }
 
 AppWindow::~AppWindow()
@@ -47,7 +47,6 @@ AppWindow::~AppWindow()
 
 void AppWindow::updateQuadPosition()
 {
-
 	// Time calculation for constant buffer.
 	unsigned long new_time = 0;
 	if (m_old_time)
@@ -64,19 +63,32 @@ void AppWindow::updateQuadPosition()
 	m_delta_pos += m_delta_time / 10.0f;
 	if (m_delta_pos > 1.0f)
 		m_delta_pos = 0;
-	m_delta_scale += m_delta_time / 0.15f;
+	m_delta_scale += m_delta_time / 0.55f;
 
 	Matrix4x4 temp = {};
 	//cc.m_world.setTranslation(Vector3D::lerp(Vector3D(-2, -2, 0), Vector3D(2, 2, 0), m_delta_pos));
-	cc.m_world.setScale(Vector3D::lerp(Vector3D(0.5f, 0.5f, 0), Vector3D(1.0f, 1.0f, 0), (sin(m_delta_scale) + 1.0f) / 2.0f));
-	temp.setTranslation(Vector3D::lerp(Vector3D(-1.5f, -1.5f, 0), Vector3D(1.5f, 1.5f, 0), m_delta_pos));
+	///cc.m_world.setScale(Vector3D::lerp(Vector3D(0.5f, 0.5f, 0), Vector3D(1.0f, 1.0f, 0), (sin(m_delta_scale) + 1.0f) / 2.0f));
+	///temp.setTranslation(Vector3D::lerp(Vector3D(-1.5f, -1.5f, 0), Vector3D(1.5f, 1.5f, 0), m_delta_pos));
+	///cc.m_world *= temp;
+	cc.m_world.setScale(Vector3D(1.0f, 1.0f, 1.0f));
+
+	temp.setIdentity();
+	temp.setRotationZ(m_delta_scale);
+	cc.m_world *= temp;
+
+	temp.setIdentity();
+	temp.setRotationY(m_delta_scale);
+	cc.m_world *= temp;
+
+	temp.setIdentity();
+	temp.setRotationX(m_delta_scale);
 	cc.m_world *= temp;
 
 	cc.m_view.setIdentity();
 	cc.m_proj.setOthroLH
 	(
-		(float)(this->getClientWindowRect().right - this->getClientWindowRect().left) / 400.0f,
-		(float)(this->getClientWindowRect().bottom - this->getClientWindowRect().top) / 400.0f,
+		(float)(this->getClientWindowRect().right - this->getClientWindowRect().left) / 300.0f,
+		(float)(this->getClientWindowRect().bottom - this->getClientWindowRect().top) / 300.0f,
 		-4.0f,
 		4.0f
 	);
@@ -112,18 +124,50 @@ void AppWindow::onCreate()
 	};**/
 
 	// List od points for the quad, first three are initial triangle, last one is the remaining.
-	vertex list[] =
+	vertex vertex_list[] =
 	{
-		{ Vector3D(-0.5f, -0.5f, 0.0f), Vector3D(-0.32f, -0.11f, 0.0f), Vector3D(0, 0, 0), Vector3D(0, 1, 0) }, // Bottom left,
-		{ Vector3D(-0.5f, 0.5f, 0.0f), Vector3D(-0.11f, 0.78f, 0.0f), Vector3D(1, 1, 0), Vector3D(0, 1, 1) }, // Top left,
-		{ Vector3D(0.5f, -0.5f, 0.0f), Vector3D(0.75f, -0.73f, 0.0f), Vector3D(0, 0, 1), Vector3D(1, 0, 0) }, // Bottom right,
-		{ Vector3D(0.5f, 0.5f, 0.0f), Vector3D(0.88f, 0.77f, 0.0f), Vector3D(1, 1, 1), Vector3D(0, 0, 1) } // Top right.
+		// Front face
+		{ Vector3D(-0.5f, -0.5f, -0.5f),	Vector3D(1, 0, 0), Vector3D(0.2f, 0, 0) },		// Point 0
+		{ Vector3D(-0.5f, 0.5f, -0.5f),		Vector3D(1, 1, 0), Vector3D(0.2f, 0.2f, 0) },	// Point 1
+		{ Vector3D(0.5f, 0.5f, -0.5f),		Vector3D(1, 1, 0), Vector3D(0.2f, 0.2f, 0) },	// Point 2
+		{ Vector3D(0.5f, -0.5f, -0.5f),		Vector3D(1, 0, 0), Vector3D(0.2f, 0, 0) },		// Point 3
+		// Back face
+		{ Vector3D(0.5f, -0.5f, 0.5f),		Vector3D(0, 1, 0), Vector3D(0, 0.2f, 0) },		// Point 4
+		{ Vector3D(0.5f, 0.5f, 0.5f),		Vector3D(0, 1, 1), Vector3D(0, 0.2f, 0.2f) },	// Point 5
+		{ Vector3D(-0.5f, 0.5f, 0.5f),		Vector3D(0, 1, 1), Vector3D(0, 0.2f, 0.2f) },	// Point 6
+		{ Vector3D(-0.5f, -0.5f, 0.5f),		Vector3D(0, 1, 0), Vector3D(0, 0.2f, 0) }		// Point 7
 	};
 
 	// Create the vertext buffer and shader.
 	m_vb = GraphicsEngine::get()->createVertexBuffer();
-	UINT size_list = ARRAYSIZE(list);
+	UINT size_list = ARRAYSIZE(vertex_list);
 	//GraphicsEngine::get()->createShaders();
+
+	unsigned int index_list[] =
+	{
+		// Front side
+		0, 1, 2, // First triangle
+		2, 3, 0, // Second triangle
+		// Back side
+		4, 5, 6,
+		6, 7, 4,
+		// Top side
+		1, 6, 5,
+		5, 2, 1,
+		// Bottom side
+		7, 0, 3,
+		3, 4, 7,
+		// Right side
+		3, 2, 5,
+		5, 4, 3,
+		// Left side
+		7, 6, 1,
+		1, 0, 7
+	};
+
+	m_ib = GraphicsEngine::get()->createIndexBuffer();
+	UINT size_index_list = ARRAYSIZE(index_list);
+	m_ib->load(index_list, size_index_list);
 
 	void* shader_byte_code = nullptr;
 	size_t size_shader = 0;
@@ -132,7 +176,7 @@ void AppWindow::onCreate()
 	// Compile the shader and load it.
 	//GraphicsEngine::get()->getShaderBufferAndSize(&shader_byte_code, &size_shader);
 	m_vs = GraphicsEngine::get()->createVertexShader(shader_byte_code, size_shader);
-	m_vb->load(list, sizeof(vertex), size_list, shader_byte_code, static_cast<UINT>(size_shader));
+	m_vb->load(vertex_list, sizeof(vertex), size_list, shader_byte_code, static_cast<UINT>(size_shader));
 
 	// Release compiled shader.
 	GraphicsEngine::get()->releaseCompiledShader();
@@ -171,8 +215,11 @@ void AppWindow::onUpdate()
 	GraphicsEngine::get()->getImmediateDeviceContext()->setPixelShader(m_ps);
 
 	GraphicsEngine::get()->getImmediateDeviceContext()->setVertexBuffer(m_vb);
+	// Set the index buffer.
+	GraphicsEngine::get()->getImmediateDeviceContext()->setIndexBuffer(m_ib);
+
 	// Draw the triangle using the vertices pushed to the context.
-	GraphicsEngine::get()->getImmediateDeviceContext()->drawTriangleStrip(m_vb->getSizeVertexList(), 0);
+	GraphicsEngine::get()->getImmediateDeviceContext()->drawIndexedTriangleList(m_ib->getSizeIndexList(), 0, 0);
 	// Present back buffer.
 	m_swap_chain->present(true);
 
@@ -185,6 +232,8 @@ void AppWindow::onDestroy()
 {
 	Window::onDestroy();
 	if (m_vb) m_vb->release();
+	if (m_cb) m_cb->release();
+	if (m_ib) m_ib->release();
 	m_swap_chain->release();
 	if (m_vs) m_vs->release();
 	if (m_ps) m_ps->release();
