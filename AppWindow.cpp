@@ -27,7 +27,7 @@ struct constant
 	Matrix4x4 m_world;
 	Matrix4x4 m_view;
 	Matrix4x4 m_proj;
-	float m_angle;
+	unsigned int m_time;
 };
 
 AppWindow::AppWindow()
@@ -50,16 +50,16 @@ AppWindow::~AppWindow()
 void AppWindow::update()
 {
 	// Time calculation for constant buffer.
-	unsigned long new_time = 0;
+	/*unsigned long new_time = 0;
 	if (m_old_time)
 		new_time = ::GetTickCount() - m_old_time;
 	m_delta_time = new_time / 1000.0f;
 	m_old_time = ::GetTickCount();
-	m_angle += 1.57f * m_delta_time;
+	m_angle += 1.57f * m_delta_time;*/
 
 	// Populate constant values for ConstantBuffer.
 	constant cc = {};
-	cc.m_angle = m_angle;
+	cc.m_time = ::GetTickCount();
 
 	// Calculate delta position and scale.
 	m_delta_pos += m_delta_time / 10.0f;
@@ -191,7 +191,7 @@ void AppWindow::onCreate()
 	GraphicsEngine::get()->getRenderSystem()->releaseCompiledShader();
 
 	constant cc = {};
-	cc.m_angle = 0;
+	cc.m_time = 0;
 	m_cb = GraphicsEngine::get()->getRenderSystem()->createConstantBuffer(&cc, sizeof(constant));
 }
 
@@ -231,6 +231,9 @@ void AppWindow::onUpdate()
 	/*m_old_delta = m_new_delta;
 	m_new_delta = ::GetTickCount();
 	m_delta_time = (m_old_delta) ? ((m_new_delta - m_old_delta) / 1000.0f) : 0;*/
+	m_old_delta = m_new_delta;
+	m_new_delta = ::GetTickCount();
+	m_delta_time = (m_old_delta) ? ((m_new_delta - m_old_delta) / 1000.0f) : 0;
 }
 
 void AppWindow::onDestroy()

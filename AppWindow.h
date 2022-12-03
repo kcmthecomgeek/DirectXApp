@@ -45,13 +45,14 @@ private:
     VertexShader* m_vs;
     PixelShader* m_ps;
 
-    unsigned long m_old_time = 0;
+    long m_old_delta = 0;
+    long m_new_delta = 0;
     float m_delta_time = 0;
-    float m_angle = 0;
+    //float m_angle = 0;
+
     float m_delta_pos = 0;
     float m_delta_scale = 0;
-    //float m_old_delta = 0;
-    //float m_new_delta = 0;
+    float m_delta_rot = 0;
 
     float m_rot_x = 0.0f;
     float m_rot_y = 0.0f;
