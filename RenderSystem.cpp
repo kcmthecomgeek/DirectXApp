@@ -11,7 +11,7 @@
 
 RenderSystem::RenderSystem()
 {
-	m_d3d_device = nullptr;
+	/*m_d3d_device = nullptr;
 	m_feature_level = D3D_FEATURE_LEVEL_11_0;
 	m_imm_device_context = nullptr;
 	m_dxgi_device = nullptr;
@@ -22,16 +22,8 @@ RenderSystem::RenderSystem()
 	m_vsblob = nullptr;
 	m_psblob = nullptr;
 	m_vs = nullptr;
-	m_ps = nullptr;
-}
+	m_ps = nullptr;*/
 
-RenderSystem::~RenderSystem()
-{
-
-}
-
-bool RenderSystem::init()
-{
 	// Arrays for driver type preferences and target feature levels.
 	D3D_DRIVER_TYPE driver_types[] =
 	{
@@ -74,20 +66,18 @@ bool RenderSystem::init()
 
 	// App isn't compatible. Return failure...
 	if (FAILED(result))
-		return false;
+		throw std::exception("RenderSystem: could not load successfully.");
 
 	// Store back buffer for later use.
-	m_imm_device_context = new DeviceContext(m_imm_context, this);
+	m_imm_device_context = std::make_shared<DeviceContext>(m_imm_context, this);
 
 	// Create and populate the DXGI objects.
 	m_d3d_device->QueryInterface(__uuidof(IDXGIDevice), (void**)&m_dxgi_device);
 	m_dxgi_device->GetParent(__uuidof(IDXGIAdapter), (void**)&m_dxgi_adapter);
 	m_dxgi_adapter->GetParent(__uuidof(IDXGIFactory), (void**)&m_dxgi_factory);
-
-	return true;
 }
 
-bool RenderSystem::release()
+RenderSystem::~RenderSystem()
 {
 	if (m_vs) m_vs->Release();
 	if (m_ps) m_ps->Release();
@@ -99,73 +89,72 @@ bool RenderSystem::release()
 	m_dxgi_adapter->Release();
 	m_dxgi_factory->Release();
 
-	delete m_imm_device_context;
 	m_d3d_device->Release();
-	return true;
 }
 
-SwapChain* RenderSystem::createSwapChain(HWND hwnd, UINT width, UINT height)
+SwapChainPtr RenderSystem::createSwapChain(HWND hwnd, UINT width, UINT height)
 {
-	SwapChain* sc = nullptr;
+	SwapChainPtr sc = nullptr;
 	try 
 	{
-		sc = new SwapChain(hwnd, width, height, this);
+		sc = std::make_shared<SwapChain>(hwnd, width, height, this);
 	}
 	catch (...) {}
 	return sc;
 }
 
-VertexBuffer* RenderSystem::createVertexBuffer(void* list_vertices, UINT size_vertex, UINT size_list,
+VertexBufferPtr RenderSystem::createVertexBuffer(void* list_vertices, UINT size_vertex, UINT size_list,
 	void* shader_byte_code, UINT size_byte_shader)
 {
-	VertexBuffer* vb = nullptr;
+	VertexBufferPtr vb = nullptr;
 	try
 	{
-		vb = new VertexBuffer(list_vertices, size_vertex, size_list, shader_byte_code, size_byte_shader, this);
+		vb = std::make_shared<VertexBuffer>(list_vertices, size_vertex, size_list, 
+			shader_byte_code, size_byte_shader, this);
 	}
 	catch (...) {}
 	return vb;
 }
 
-IndexBuffer* RenderSystem::createIndexBuffer(void* list_indices, UINT size_list)
+IndexBufferPtr RenderSystem::createIndexBuffer(void* list_indices, UINT size_list)
 {
-	IndexBuffer* ib = nullptr;
+	IndexBufferPtr ib = nullptr;
 	try
 	{
-		ib = new IndexBuffer(list_indices, size_list, this);
+		ib = std::make_shared<IndexBuffer>(list_indices, size_list, this);
 	}
 	catch (...) {}
 	return ib;
 }
 
-ConstantBuffer* RenderSystem::createConstantBuffer(void* buffer, UINT size_buffer)
+ConstantBufferPtr RenderSystem::createConstantBuffer(void* buffer, UINT size_buffer)
 {
-	ConstantBuffer* cb = nullptr;
+	ConstantBufferPtr cb = nullptr;
 	try
 	{
-		cb = new ConstantBuffer(buffer, size_buffer, this);
+		cb = std::make_shared<ConstantBuffer>(buffer, size_buffer, this);
 	}
 	catch (...) {}
 	return cb;
 }
 
-VertexShader* RenderSystem::createVertexShader(const void* shader_byte_code, size_t byte_code_size)
+VertexShaderPtr RenderSystem::createVertexShader(const void* shader_byte_code, size_t byte_code_size)
 {
-	VertexShader* vs = nullptr;
+	VertexShaderPtr vs = nullptr;
 	try
 	{
-		vs = new VertexShader(shader_byte_code, byte_code_size, this);
+		vs = std::make_shared<VertexShader>(shader_byte_code, byte_code_size, this);
 	}
 	catch (...) {}
 	return vs;
 }
 
-PixelShader* RenderSystem::createPixelShader(const void* shader_byte_code, size_t byte_code_size)
+PixelShaderPtr RenderSystem::createPixelShader(const void* shader_byte_code, size_t byte_code_size)
 {
-	PixelShader* ps = nullptr;
+	PixelShaderPtr ps = nullptr;
 	try
 	{
-		ps = new PixelShader(shader_byte_code, byte_code_size, this);
+		ps = std::make_shared<PixelShader>(shader_byte_code, byte_code_size, this);
 	}
 	catch (...) {}
 	return ps;

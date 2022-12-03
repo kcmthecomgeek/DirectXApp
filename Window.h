@@ -7,12 +7,7 @@ public:
 	Window();
 	~Window();
 
-	bool init();
-	bool broadcast();
-	bool release();
-
 	RECT getClientWindowRect();
-	void setHWND(HWND hwnd) { this->m_hwnd = hwnd; };
 
 	virtual void onCreate();
 	virtual void onUpdate();
@@ -20,11 +15,15 @@ public:
 	virtual void onFocus();
 	virtual void onKillFocus();
 
-	bool isRunning() { return m_isRunning; };
+	bool isRunning();
+
+private:
+	bool broadcast();
 
 protected:
 	HWND m_hwnd;
 	bool m_isRunning;
+	bool m_isInit = false;
 };
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);

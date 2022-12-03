@@ -123,7 +123,7 @@ void AppWindow::onCreate()
 	InputSystem::get()->showCursor(false);
 
 	// Init graphics engine.
-	GraphicsEngine::get()->init();
+	//GraphicsEngine::get()->init();
 	// Create swap chain.
 	// Get window rectangle and init the swap chain.
 	RECT rc = this->getClientWindowRect();
@@ -241,7 +241,7 @@ void AppWindow::onDestroy()
 	Window::onDestroy();
 	// Remove InputSystem listener.
 	InputSystem::get()->removeListener(this);
-	GraphicsEngine::get()->release();
+	//GraphicsEngine::get()->release();
 }
 
 void AppWindow::onFocus()

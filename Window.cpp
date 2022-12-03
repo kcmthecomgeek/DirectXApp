@@ -1,18 +1,7 @@
 #include "Window.h"
-
+#include <exception>
 
 Window::Window()
-{
-	m_hwnd = NULL;
-	m_isRunning = false;
-}
-
-Window::~Window()
-{
-
-}
-
-bool Window::init()
 {
 	// Window registration parameters.
 	WNDCLASSEX wc = {}; // Init empty variable.
@@ -28,10 +17,10 @@ bool Window::init()
 	wc.lpszMenuName = L""; // Empty menu name.
 	wc.style = NULL; // No style values yet.
 	wc.lpfnWndProc = &WndProc;
-	
+
 	// Register, return if failed.
 	if (!::RegisterClassEx(&wc))
-		return false;
+		throw std::exception("Window: could not register window class.");
 
 	// Create and store Window object.
 	m_hwnd = ::CreateWindowEx(
@@ -44,11 +33,11 @@ bool Window::init()
 		NULL, // Parent window.
 		NULL, // Menu object.
 		NULL, // HINSTANCE
-		this); // Create paramters. Adding "this" will pass a point to this object for use in WM_CREATE.
+		NULL); // Create paramters. Adding "this" will pass a point to this object for use in WM_CREATE.
 
 	// Return false if window couldn't be created.
 	if (!m_hwnd)
-		return false;
+		throw std::exception("Window: failed to create window.");
 
 	// Show and update window (draw).
 	::ShowWindow(m_hwnd, SW_SHOW);
@@ -56,12 +45,24 @@ bool Window::init()
 
 	// "Start" the game.
 	m_isRunning = true;
+}
 
-	return true;
+Window::~Window()
+{
+	
 }
 
 bool Window::broadcast()
 {
+	if (!this->m_isInit)
+	{
+		// Store the pointer in custom user data for the window.
+		SetWindowLongPtr(m_hwnd, GWLP_USERDATA, (LONG_PTR)this);
+		// Store the HWND object in the "Window" pointer.
+		this->onCreate();
+		this->m_isInit = true;
+	}
+
 	// Call the exposed update function.
 	this->onUpdate();
 
@@ -75,15 +76,6 @@ bool Window::broadcast()
 
 	// Prevent 99% CPU.
 	Sleep(1);
-
-	return true;
-}
-
-bool Window::release()
-{
-	// Destroy window object if it exists.
-	if (!::DestroyWindow(m_hwnd))
-		return false;
 
 	return true;
 }
@@ -121,25 +113,26 @@ void Window::onKillFocus()
 
 }
 
+bool Window::isRunning()
+{
+	if (m_isRunning)
+		broadcast();
+	return m_isRunning;
+}
+
 LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	switch (msg)
 	{
 	case WM_CREATE:
 	{
-		// Copy the pointer passed in last parameter in "CreateWindowEx".
-		Window* window = (Window*)((LPCREATESTRUCT)lParam)->lpCreateParams;
-		// Store the pointer in custom user data for the window.
-		SetWindowLongPtr(hWnd, GWLP_USERDATA, (LONG_PTR)window);
-		// Store the HWND object in the "Window" pointer.
-		window->setHWND(hWnd);
-		window->onCreate();
+		
 		break;
 	}
 	case WM_SETFOCUS:
 	{
 		Window* window = (Window*)GetWindowLongPtr(hWnd, GWLP_USERDATA);
-		window->onFocus();
+		if (window) window->onFocus();
 		break;
 	}
 	case WM_KILLFOCUS:

@@ -38,12 +38,12 @@ public:
     virtual void onRightMouseUp(const Point& mouse_pos) override;
 
 private:
-    SwapChain* m_swap_chain;
-    VertexBuffer* m_vb;
-    ConstantBuffer* m_cb;
-    IndexBuffer* m_ib;
-    VertexShader* m_vs;
-    PixelShader* m_ps;
+    SwapChainPtr m_swap_chain;
+    VertexBufferPtr m_vb;
+    ConstantBufferPtr m_cb;
+    IndexBufferPtr m_ib;
+    VertexShaderPtr m_vs;
+    PixelShaderPtr m_ps;
 
     long m_old_delta = 0;
     long m_new_delta = 0;

@@ -8,7 +8,7 @@ public:
 	ConstantBuffer(void* buffer, UINT size_buffer, RenderSystem* system);
 	~ConstantBuffer();
 
-	void update(DeviceContext* context, void* buffer);
+	void update(DeviceContextPtr context, void* buffer);
 
 private:
 	ID3D11Buffer* m_buffer;

@@ -48,7 +48,7 @@
     <ClCompile Include="AppWindow.cpp">
       <Filter>App</Filter>
     </ClCompile>
-    <ClCompile Include="main.cpp">
+    <ClCompile Include="WinMain.cpp">
       <Filter>App</Filter>
     </ClCompile>
     <ClCompile Include="Window.cpp">
