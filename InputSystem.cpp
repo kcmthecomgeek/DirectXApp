@@ -94,21 +94,11 @@ void InputSystem::update()
 
 void InputSystem::addListener(InputListener* listener)
 {
-	//m_map_listeners.insert(
-	//	std::make_pair<InputListener*, InputListener*>
-	//	(std::forward<InputListener*>(listener), std::forward<InputListener*>(listener)));
 	m_set_listeners.insert(listener);
 }
 
 void InputSystem::removeListener(InputListener* listener)
 {
-	//std::map<InputListener*, InputListener*>::iterator it =
-	//	m_map_listeners.find(listener);
-
-	//if (it != m_map_listeners.end())
-	//{
-	//	m_map_listeners.erase(it);
-	//}
 	m_set_listeners.erase(listener);
 }
 

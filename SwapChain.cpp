@@ -1,21 +1,12 @@
 #include "SwapChain.h"
-#include "GraphicsEngine.h"
+#include "RenderSystem.h"
+#include <exception>
 
-SwapChain::SwapChain()
-{
-	m_swap_chain = nullptr;
-	m_rtv = nullptr;
-}
-
-SwapChain::~SwapChain()
-{
-
-}
-
-bool SwapChain::init(HWND hwnd, UINT width, UINT height)
+SwapChain::SwapChain(HWND hwnd, UINT width, UINT height, RenderSystem* system)
+	: m_system(system), m_rtv(0)
 {
 	// Get the D3D device from graphics engine.
-	ID3D11Device* device = GraphicsEngine::get()->m_d3d_device;
+	ID3D11Device* device = m_system->m_d3d_device;
 
 	// Swap chain configuration.
 	DXGI_SWAP_CHAIN_DESC desc = {};
@@ -29,38 +20,35 @@ bool SwapChain::init(HWND hwnd, UINT width, UINT height)
 	desc.BufferDesc.RefreshRate.Denominator = 1; // Multiplier of numberator. Normally 1.
 	desc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT; // Buffer usage type.
 	desc.OutputWindow = hwnd; // Window handle.
-	desc.SampleDesc.Count = 1; 
+	desc.SampleDesc.Count = 1;
 	desc.SampleDesc.Quality = 0;
 	desc.Windowed = TRUE; // Windowed mode.
 
 	// Create the swap chain.
-	HRESULT result = GraphicsEngine::get()->m_dxgi_factory->CreateSwapChain(device, &desc, &m_swap_chain);
+	HRESULT result = m_system->m_dxgi_factory->CreateSwapChain(device, &desc, &m_swap_chain);
 
 	if (FAILED(result))
-		return false;
+		throw std::exception("SwapChain: failed to create.");
 
 	// Create buffer for back color.
 	ID3D11Texture2D* buffer = NULL;
 	result = m_swap_chain->GetBuffer(0, __uuidof(ID3D11Texture2D), (void**)&buffer);
 
 	if (FAILED(result))
-		return false;
+		throw std::exception("SwapChain: could not create buffer for back color.");
 
 	// Create the view for the render target.
 	result = device->CreateRenderTargetView(buffer, NULL, &m_rtv);
 	buffer->Release();
 
 	if (FAILED(result))
-		return false;
-
-	return true;
+		throw std::exception("SwapChain: could not create render view.");
 }
 
-bool SwapChain::release()
+SwapChain::~SwapChain()
 {
-	m_swap_chain->Release();
-	delete this;
-	return true;
+	if (m_rtv) m_rtv->Release();
+	if (m_swap_chain) m_swap_chain->Release();
 }
 
 void SwapChain::present(bool vsync)
