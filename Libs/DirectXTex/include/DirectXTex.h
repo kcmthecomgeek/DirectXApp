@@ -34,6 +34,7 @@
 struct IWICImagingFactory;
 struct IWICMetadataQueryReader;
 
+#pragma warning(disable:26813)
 
 namespace DirectX
 {

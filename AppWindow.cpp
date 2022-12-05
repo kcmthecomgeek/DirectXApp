@@ -122,8 +122,8 @@ void AppWindow::onCreate()
 	InputSystem::get()->addListener(this);
 	InputSystem::get()->showCursor(false);
 
-	TexturePtr m_wood_tex = GraphicsEngine::get()->
-		getTextureManager()->createTextureFromFile(L"Assets\\Textures\\wood.jpg");
+	m_wood_tex = GraphicsEngine::get()->getTextureManager()->
+		createTextureFromFile(L"Assets\\Textures\\wood.jpg");
 
 	// Init graphics engine.
 	//GraphicsEngine::get()->init();
@@ -264,6 +264,8 @@ void AppWindow::onUpdate()
 	GraphicsEngine::get()->getRenderSystem()->getImmediateDeviceContext()->setVertexShader(m_vs);
 	GraphicsEngine::get()->getRenderSystem()->getImmediateDeviceContext()->setPixelShader(m_ps);
 
+	GraphicsEngine::get()->getRenderSystem()->getImmediateDeviceContext()->setTexture(m_ps, m_wood_tex);
+
 	GraphicsEngine::get()->getRenderSystem()->getImmediateDeviceContext()->setVertexBuffer(m_vb);
 	// Set the index buffer.
 	GraphicsEngine::get()->getRenderSystem()->getImmediateDeviceContext()->setIndexBuffer(m_ib);
@@ -337,7 +339,7 @@ void AppWindow::onMouseMove(const Point& mouse_pos)
 	m_rot_x += (mouse_pos.m_y - (height / 2.0f)) * m_delta_time * 0.1f;
 	m_rot_y += (mouse_pos.m_x - (width / 2.0f)) * m_delta_time * 0.1f;
 
-	InputSystem::get()->setCursorPosition(Point(width / 2.0f, height / 2.0f));
+	InputSystem::get()->setCursorPosition(Point(width / 2, height / 2));
 }
 
 void AppWindow::onLeftMouseDown(const Point& mouse_pos)

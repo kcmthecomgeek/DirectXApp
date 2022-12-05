@@ -44,6 +44,7 @@ private:
     IndexBufferPtr m_ib;
     VertexShaderPtr m_vs;
     PixelShaderPtr m_ps;
+    TexturePtr m_wood_tex;
 
     long m_old_delta = 0;
     long m_new_delta = 0;
